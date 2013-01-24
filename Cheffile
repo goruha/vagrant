@@ -3,8 +3,6 @@
 
 site 'http://community.opscode.com/api/v1'
 
-site 'http://community.opscode.com/api/v1'
-
 cookbook 'chef-client'
 
 cookbook "apt"
@@ -14,8 +12,9 @@ cookbook "java"
 cookbook "mysql"
 cookbook "nginx"
 cookbook "openssl"
-cookbook "php"
-cookbook "php-fpm"
+cookbook "php",
+  :git => 'git://github.com/priestjim/chef-php.git',
+  :ref => 'master'
 cookbook "postfix"
 cookbook "postgresql"
 cookbook "python"

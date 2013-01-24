@@ -4,6 +4,7 @@ run_list(
   "recipe[build-essential]",
   "recipe[mysql::server]",
   "recipe[php]",
+  "recipe[php::fpm]",
   "recipe[php::module_mysql]",
   "recipe[php::module_apc]",
   "recipe[php::module_curl]",
