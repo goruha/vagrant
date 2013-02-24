@@ -44,9 +44,9 @@ cookbook 'phppgadmin',
   :ref => 'master'
 
 cookbook 'webapp',
-  :git => 'git@github.com:goruha/chef-webapp.git',
+  :git => 'https://github.com/goruha/chef-webapp.git',
   :ref => 'develop'
 
 cookbook 'apache2',
-  :git => 'git@github.com:goruha/apache2.git',
+  :git => 'https://github.com/goruha/apache2.git',
   :ref => 'master'
