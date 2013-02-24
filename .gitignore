@@ -3,5 +3,6 @@ public/*
 Cheffile.lock
 Gemfile.lock
 cookbooks/*/*
+cookbooks/README
 .idea
 tmp

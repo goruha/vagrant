@@ -37,17 +37,17 @@ Vagrant::Config.run do |config|
   config.vm.provision :chef_solo do |chef|
     chef.cookbooks_path = ["cookbooks", "site-cookbooks"]
     chef.roles_path = "roles"
-#    chef.data_bags_path = "data_bags"
+    chef.data_bags_path = "data_bags"
 
 #      # puts "It's first run of box, and not be initialized by chef"
 
       chef.log_level = :debug # :info
       # install make & mc, apt
-      chef.add_recipe "aplab_v"
-      #chef.add_recipe "platform_packages::data_bag"
-      #chef.add_recipe "apt"
+      chef.add_recipe "aplab_vm"
+      chef.add_recipe "platform_packages::data_bag"
+      chef.add_recipe "apt"
 
       # lamp/nginx & drupal
-#      chef.add_role "lnmp"
+      chef.add_role "lnmp"
   end
 end
