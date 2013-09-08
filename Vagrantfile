@@ -1,111 +1,39 @@
-# -*- mode: ruby -*-
-
-Vagrant::Config.run do |config|
+Vagrant.configure("2") do |config|
 
   config.vm.box = "precise32"
   config.vm.box_url = "http://files.vagrantup.com/precise32.box"
-  # config.vm.box = "precise64"
-  # config.vm.box_url = "http://files.vagrantup.com/precise64.box"
-  # config.vm.box = "lucid32"
-  # config.vm.box_url = "http://files.vagrantup.com/lucid32.box"
-  
-  # config.vm.boot_mode = :gui
-  
-  config.vm.customize ["modifyvm", :id, "--memory", "768"]
-  # config.vm.customize ["modifyvm", :id, "--memory", "1024"]
 
-  # host, bridge
-  network = "host"
-  if ENV["OS"].to_s.include? "Windows" then
-    nfsd = false
-  else
-    nfsd = true
+  config.vm.provider "virtualbox" do |v|
+    v.customize ["modifyvm", :id, "--memory", "1024"]
   end
 
-  if network == "host" 
-    config.vm.network :hostonly, "33.33.33.10"
-    config.vm.forward_port 80, 8000
-    config.vm.forward_port 8080, 8080
-    config.vm.forward_port 3306, 3306
-    config.vm.forward_port 5432, 5432
-    config.vm.share_folder "v-data", "/vagrant", ".", :nfs => nfsd
-  end
+#  if ENV["OS"].to_s.include? "Windows" then
+#    nfsd = false
+#  else
+#    nfsd = true
+#  end
 
-  if network == "bridge" 
-    config.vm.network :bridged
-    config.vm.forward_port 80, 80
-    config.vm.share_folder "v-data", "/vagrant", ".", :nfs => false
-  end
-  
-  config.vm.provision :chef_solo do |chef|
-    chef.cookbooks_path = ["cookbooks", "site-cookbooks"]
-    chef.roles_path = "roles"
-    chef.data_bags_path = "data_bags"
+   config.vm.network "private_network", ip: "33.33.33.33"
+   config.vm.network "forwarded_port", guest: 80, host: 80
+#    config.vm.forward_port 8080, 8080
+#    config.vm.forward_port 3306, 3306
+#    config.vm.forward_port 5432, 5432
+    config.vm.synced_folder ".", "/vagrant" #, nfs: true
+#    config.vm.synced_folder "./public/www", "/srv/dev_dev/current/public" #, nfs: true
 
-    if !File.exists?("del_me_to_first_run")
-      # puts "It's first run of box, and not be initialized by chef"
-      
-      chef.log_level = :debug # :info
-      # set timezone to Moscow UTC+4
-      chef.add_recipe "drupal::init"
-      # install make & mc, apt
-      chef.add_recipe "platform_packages::data_bag"
-      chef.add_recipe "apt"
-
-      # lamp/nginx & drupal
-      # chef.add_role "drupal_nginx"
-      chef.add_role "drupal_lamp"
-      # dev
-      chef.add_recipe "drupal::dev"
-      # python & pgsql + postgis, zsh
-      chef.add_role "addition"
-      # phing & jenkins
-      chef.add_recipe "drupal::ci"
-
-      chef.json.merge!({
-        :doc_root => '/vagrant/public',
-        :mysql => {
-          :server_root_password => "root",
-          :server_debian_password => "root",
-          :server_repl_password => "root",
-          :allow_remote_root => true,
-          :bind_address => '0.0.0.0',
-        },
-        :postgresql => {
-          :password => {
-            :postgres => "postgres",
-          },
-          # configure pgsql to allow remote connections
-          :pg_hba => [
-            {:type => 'local', :db => 'all', :user => 'postgres', :addr => nil, :method => 'ident'},
-            {:type => 'local', :db => 'all', :user => 'all', :addr => nil, :method => 'md5'},
-            {:type => 'host', :db => 'all', :user => 'all', :addr => '0.0.0.0/0', :method => 'md5'},
-            {:type => 'host', :db => 'all', :user => 'all', :addr => '::1/128', :method => 'md5'},
-          ],
-          :config => {
-            :listen_addresses => "*",
-            :ssl => false,
-          },
-          :dbuser => 'air',
-          :dbname => 'air',
-          :dbpass => 'airpwd',
-        },
-        :drupal => {
-          :hosts => ["air.vm", "dev.vm"],
-        },
-        :drush => {
-         :install_method => 'pear',
-         :version => '5.7.0',
-        },
-        :phing => {
-          :version => '2.4.14',
-        }
-  	  })
-      # f = File.open("del_me_to_first_run", "w")
-      # f.write("delete this file to initial run chef")
-    else
-      # puts "Vagrant box has already been initialized"
-      chef.add_recipe "drupal::init"
-    end
+   config.vm.provision "chef_solo" do |chef|
+    chef.cookbooks_path = ["cookbooks", "site-cookbooks", "environments", "applications", "roles"]
+    #chef.roles_path = "roleis"
+    #chef.data_bags_path = "data_bags"
+    chef.log_level = :debug # :info
+    # install make & mc, apt
+    #chef.add_recipe "platform_packages::data_bag"
+    #chef.add_recipe "apt"
+    # lamp/nginx & drupal
+    chef.add_recipe "env_development"
+    #chef.json.merge!({
+    #    :doc_root => '/vagrant/public',
+  	#  })
   end
 end
+

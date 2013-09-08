@@ -1,1 +1,1 @@
-include_recipe "app_mysql"
+include_recipe "mysql"

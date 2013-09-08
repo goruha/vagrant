@@ -1,2 +1,2 @@
-include_recipe "app_ubuntu"
-include_recipe "app_mysql"
+include_recipe "app_nginx"
+include_recipe "app_php"

@@ -15,7 +15,10 @@ cookbook "java"
 cookbook "mysql"
 cookbook "nginx"
 cookbook "openssl"
-cookbook "php"
+cookbook "php",
+  :git => 'https://github.com/priestjim/chef-php.git',
+  :ref => 'master'
+
 cookbook "postfix"
 cookbook "postgresql"
 cookbook "python"
